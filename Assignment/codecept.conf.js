@@ -1,4 +1,5 @@
 const { setHeadlessWhen, setCommonPlugins } = require("@codeceptjs/configure");
+require('dotenv').config();
 // turn on headless mode when running with HEADLESS=true environment variable
 // export HEADLESS=true && npx codeceptjs run
 setHeadlessWhen(process.env.HEADLESS);
@@ -16,7 +17,7 @@ exports.config = {
   helpers: {
     Playwright: {
       browser: "chromium",
-      url: "https://github.com",
+      url: "https://www.facebook.com",
       show: true,
     },
     AI: {},
@@ -26,34 +27,34 @@ exports.config = {
   },
   name: "codeceptAI",
   ai: {
-    /**Grob */
-    // request: async (messages) => {
-    //   const Groq = require("groq-sdk");
-    //   const groq = new Groq({
-    //     apiKey: "",
-    //   });
-
-    //   const chatCompletion = await groq.chat.completions.create({
-    //     messages,
-    //     model: "mixtral-8x7b-32768", // llama2-70b-4096 || gemma-7b-it
-    //   });
-    //   return chatCompletion.choices[0]?.message?.content || "";
-    // },
-
-    /**Openai */
+    /**Groq - Free alternative */
     request: async (messages) => {
-      const OpenAI = require("openai");
-      const openai = new OpenAI({
-        apiKey: "",
+      const Groq = require("groq-sdk");
+      const groq = new Groq({
+        apiKey: process.env.GROQ_API_KEY,
       });
 
-      const completion = await openai.chat.completions.create({
-        model: "gpt-4o-mini-2024-07-18",
+      const chatCompletion = await groq.chat.completions.create({
         messages,
+        model: "llama-3.1-8b-instant", // Latest working model
       });
-
-      return completion?.choices[0]?.message?.content || "";
+      return chatCompletion.choices[0]?.message?.content || "";
     },
+
+    /**OpenAI - Requires valid billing/credits */
+    // request: async (messages) => {
+    //   const OpenAI = require("openai");
+    //   const openai = new OpenAI({
+    //     apiKey: process.env.OPENAI_API_KEY,
+    //   });
+
+    //   const completion = await openai.chat.completions.create({
+    //     model: "gpt-4o-mini-2024-07-18",
+    //     messages,
+    //   });
+
+    //   return completion?.choices[0]?.message?.content || "";
+    // },
   },
   plugins: {
     screenshotOnFail: {
